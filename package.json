@@ -1,0 +1,25 @@
+{
+  "name": "supply-api",
+  "version": "1.0.0",
+  "description": "REST API for fetching the supplies of CLOUD on the Base blockchain.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CloudAI-Org/supply-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CloudAI-Org/supply-api/issues"
+  },
+  "homepage": "https://github.com/CloudAI-Org/supply-api#readme",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5",
+    "express": "^4.21.2"
+  }
+}

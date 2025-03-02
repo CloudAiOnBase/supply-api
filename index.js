@@ -27,10 +27,11 @@ const cloudTokenContract = new ethers.Contract(CLOUD_TOKEN_CONTRACT, cloudTokenA
 app.get("/circulating-supply", async (req, res) => {
     try {
         const supply = await cloudUtilsContract.getCirculatingSupply();
-        res.json({ circulating_supply: supply.toString() });
+        const formattedSupply = ethers.formatUnits(supply, 18); // Convert from wei
+        res.send(formattedSupply); // Return only the number
     } catch (error) {
         console.error("Error fetching circulating supply:", error);
-        res.status(500).json({ error: "Error fetching circulating supply" });
+        res.status(500).send("Error fetching circulating supply");
     }
 });
 
@@ -38,10 +39,11 @@ app.get("/circulating-supply", async (req, res) => {
 app.get("/total-supply", async (req, res) => {
     try {
         const supply = await cloudTokenContract.totalSupply();
-        res.json({ total_supply: supply.toString() });
+        const formattedSupply = ethers.formatUnits(supply, 18); // Convert from wei
+        res.send(formattedSupply); // Return only the number
     } catch (error) {
         console.error("Error fetching total supply:", error);
-        res.status(500).json({ error: "Error fetching total supply" });
+        res.status(500).send("Error fetching total supply");
     }
 });
 

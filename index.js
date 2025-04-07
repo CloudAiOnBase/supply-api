@@ -6,29 +6,37 @@ const app = express();
 
 // Load environment variables
 const PORT = process.env.PORT || 3000;
-const RPC_URL = process.env.RPC_URL; // Use an RPC provider like Alchemy or Infura
+const RPC_URL = process.env.RPC_URL;
 
-// Contract Addresses
-const CLOUD_UTILS_CONTRACT = process.env.CLOUD_UTILS_CONTRACT_MAINNET; // Utils contract
-const CLOUD_TOKEN_CONTRACT = process.env.CLOUD_TOKEN_CONTRACT_MAINNET; // Token contract
+const CLOUD_UTILS_CONTRACT = process.env.CLOUD_UTILS_CONTRACT_MAINNET;
+const CLOUD_TOKEN_CONTRACT = process.env.CLOUD_TOKEN_CONTRACT_MAINNET;
 
-// ABIs for Contracts
 const cloudUtilsABI = ["function getCirculatingSupply() external view returns (uint256)"];
 const cloudTokenABI = ["function totalSupply() external view returns (uint256)"];
 
-// Set up provider
 const provider = new ethers.JsonRpcProvider(RPC_URL);
-
-// Set up contract instances
 const cloudUtilsContract = new ethers.Contract(CLOUD_UTILS_CONTRACT, cloudUtilsABI, provider);
 const cloudTokenContract = new ethers.Contract(CLOUD_TOKEN_CONTRACT, cloudTokenABI, provider);
+
+// Helper: Detect if request is from CoinGecko
+function isCoinGeckoRequest(req) {
+    const userAgent = req.headers["user-agent"] || "";
+    return userAgent.includes("CoinGecko");
+}
 
 // Endpoint: Get Circulating Supply
 app.get("/circulating-supply", async (req, res) => {
     try {
         const supply = await cloudUtilsContract.getCirculatingSupply();
-        const formattedSupply = ethers.formatUnits(supply, 18); // Convert from wei
-        res.send(formattedSupply); // Return only the number
+        const formatted = ethers.formatUnits(supply, 18);
+        const floatValue = parseFloat(formatted);
+
+        if (isCoinGeckoRequest(req)) {
+            res.setHeader("Content-Type", "application/json");
+            return res.status(200).json({ circulating_supply: floatValue });
+        } else {
+            return res.send(formatted); //CMC
+        }
     } catch (error) {
         console.error("Error fetching circulating supply:", error);
         res.status(500).send("Error fetching circulating supply");
@@ -39,14 +47,19 @@ app.get("/circulating-supply", async (req, res) => {
 app.get("/total-supply", async (req, res) => {
     try {
         const supply = await cloudTokenContract.totalSupply();
-        const formattedSupply = ethers.formatUnits(supply, 18); // Convert from wei
-        res.send(formattedSupply); // Return only the number
+        const formatted = ethers.formatUnits(supply, 18);
+        const floatValue = parseFloat(formatted);
+
+        if (isCoinGeckoRequest(req)) {
+            res.setHeader("Content-Type", "application/json");
+            return res.status(200).json({ total_supply: floatValue });
+        } else {
+            return res.send(formatted); //CMC
+        }
     } catch (error) {
         console.error("Error fetching total supply:", error);
         res.status(500).send("Error fetching total supply");
     }
 });
 
-// Start Server
 app.listen(PORT, () => console.log(`API running on port ${PORT}`));
-

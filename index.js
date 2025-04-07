@@ -33,7 +33,7 @@ app.get("/circulating-supply", async (req, res) => {
 
         if (isCoinGeckoRequest(req)) {
             res.setHeader("Content-Type", "application/json");
-            return res.status(200).json({ circulating_supply: floatValue });
+            return res.status(200).json({ result: floatValue });
         } else {
             return res.send(formatted); //CMC
         }
@@ -52,7 +52,7 @@ app.get("/total-supply", async (req, res) => {
 
         if (isCoinGeckoRequest(req)) {
             res.setHeader("Content-Type", "application/json");
-            return res.status(200).json({ total_supply: floatValue });
+            return res.status(200).json({ result: floatValue });
         } else {
             return res.send(formatted); //CMC
         }
